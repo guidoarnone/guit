@@ -1,10 +1,15 @@
 -- DATOS Y SHOW
 
-data Modificacion = Insertar Integer Char | Borrar Integer | Substituir Integer Char deriving (Show, Eq)
+data Modificacion
+  = Insertar Integer Char
+  | Borrar Integer
+  | Substituir Integer Char deriving (Show, Eq)
 
 type PaqueteModificaciones = [Modificacion]
 
-data Archivo = ArchivoVacio | NuevaVersion PaqueteModificaciones Archivo
+data Archivo
+  = ArchivoVacio
+  | NuevaVersion PaqueteModificaciones Archivo
 instance Show Archivo where
     show ArchivoVacio = "Archivo vacio"
     show file = "Archivo: " ++ obtenerUltimaVersion file
@@ -16,13 +21,36 @@ instance Show SCV where
 
 verArchivos :: SCV -> String
 verArchivos NuevoSCV = ""
-verArchivos (AgregarArchivo file scv) = "- " ++ (show file) ++ "\n" ++ (verArchivos scv)
+verArchivos (AgregarArchivo file scv)
+  = "- " ++ (show file) ++ "\n" ++ (verArchivos scv)
 
 -- EJERCICIOS
 
 -- Ejercicio 1/8
+
+borrar :: Integer -> String -> String
+borrar _ [] = error
+  "La string no posee un caracter en la posicion que se quiere borrar"
+borrar 0 (x:xs) = xs
+borrar n (x:xs) = x:borrar (n-1) xs
+
+sust :: Integer -> Char -> String -> String
+sust _ _ [] = error
+  "La string no posee un caracter en la posicion que se quiere sustituir"
+sust 0 c (x:xs) = c:xs
+sust n c (x:xs) = x:sust (n-1) c xs
+
+insert :: Integer -> Char -> String -> String
+insert 0 c str = c:str
+insert _ _ [] = error
+                "La posicion donde se quiere insertar no existe an la string"
+insert n c (x:xs) = x:insert (n-1) c xs
+
+
 aplicarModificacion :: String -> Modificacion -> String
-aplicarModificacion = error "Implementar!!! (ejercicio 1)"
+aplicarModificacion str (Insertar n c) = insert n c str
+aplicarModificacion str (Borrar n) = borrar n str
+aplicarModificacion str (Substituir n c) = sust n c str
 
 -- Ejemplos:
 -- Main> aplicarModificacion "d" (Insertar 1 'a')
