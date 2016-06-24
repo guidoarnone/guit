@@ -153,12 +153,12 @@ levenshtein2 [] s =  insertStr 0 s
 levenshtein2 s [] = borrarStr s
 levenshtein2 s1 s2 
   | last s1 == last s2 =
-      minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
-              Insertar (len' s1) (last s2):levenshtein2 s1 (init s2),
+      minlen [Borrar (len' s1 - 1):levenshtein2 (init s1) s2,
+              Insertar (len' s1 - 1) (last s2):levenshtein2 s1 (init s2),
               levenshtein2 (init s1) (init s2)]
   | otherwise =
-      minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
-              Insertar (len' s1) (last s2):levenshtein2 s1 (init s2),
+      minlen [Borrar (len' s1 - 1):levenshtein2 (init s1) s2,
+              Insertar (len' s1 - 1) (last s2):levenshtein2 s1 (init s2),
               Substituir (len' s1 - 1) (last s2):levenshtein2 (init s1) (init s2)]
 
     
