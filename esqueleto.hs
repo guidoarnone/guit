@@ -61,9 +61,11 @@ aplicarModificacion str (Substituir n c) = sust n c str
 -- "dto"
 
 -- Ejercicio 2/8
-aplicarPaqueteModificaciones :: String -> PaqueteModificaciones -> String
+aplicarPaqueteModificaciones ::
+  String -> PaqueteModificaciones -> String
 aplicarPaqueteModificaciones str [] = str
-aplicarPaqueteModificaciones str (m:ms) = aplicarPaqueteModificaciones (aplicarModificacion str m) ms
+aplicarPaqueteModificaciones str (m:ms) =
+  aplicarPaqueteModificaciones (aplicarModificacion str m) ms
 
 -- Ejemplos:
 -- Main> aplicarPaqueteModificaciones "dato" [Substituir 0 'p', Insertar 4 's']
@@ -72,7 +74,8 @@ aplicarPaqueteModificaciones str (m:ms) = aplicarPaqueteModificaciones (aplicarM
 -- Ejercicio 3/8
 obtenerUltimaVersion :: Archivo -> String
 obtenerUltimaVersion ArchivoVacio = ""
-obtenerUltimaVersion (NuevaVersion paquete archivo) = aplicarPaqueteModificaciones (obtenerUltimaVersion archivo) paquete
+obtenerUltimaVersion (NuevaVersion paquete archivo) =
+  aplicarPaqueteModificaciones (obtenerUltimaVersion archivo) paquete
 
 -- Ejemplos: (ver def. archivo1 y archivo2 abajo)
 -- Main> obtenerUltimaVersion archivo1
@@ -83,7 +86,8 @@ obtenerUltimaVersion (NuevaVersion paquete archivo) = aplicarPaqueteModificacion
 -- Ejercicio 4/8
 cantVersiones :: Archivo -> Integer
 cantVersiones ArchivoVacio = 0
-cantVersiones (NuevaVersion paquete archivo) = 1 + cantVersiones archivo
+cantVersiones (NuevaVersion paquete archivo) =
+  1 + cantVersiones archivo
 
 -- Ejemplos:
 -- Main> cantVersiones archivo1
@@ -93,13 +97,14 @@ cantVersiones (NuevaVersion paquete archivo) = 1 + cantVersiones archivo
 
 -- Ejercicio 5/8
 
-obtenerArchivoAnterior :: Archivo -> Archivo
-obtenerArchivoAnterior ArchivoVacio = ArchivoVacio
-obtenerArchivoAnterior (NuevaVersion paquete archivo) = archivo
+obtenerVersionAnterior :: Archivo -> Archivo
+obtenerVersionAnterior ArchivoVacio = ArchivoVacio
+obtenerVersionAnterior (NuevaVersion paquete archivo) = archivo
 
 obtenerVersion :: Integer -> Archivo -> String
-obtenerVersion n archivo | cantVersiones archivo == n = obtenerUltimaVersion archivo
-                         | otherwise = obtenerVersion n (obtenerArchivoAnterior archivo)
+obtenerVersion n archivo
+  | cantVersiones archivo == n = obtenerUltimaVersion archivo
+  | otherwise = obtenerVersion n (obtenerVersionAnterior archivo)
 
 -- Ejemplos:
 -- Main> obtenerVersion 1 archivo2
