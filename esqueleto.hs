@@ -111,9 +111,23 @@ obtenerVersion n archivo
 -- "dato"
 
 -- Ejercicio 6/8
-levenshtein :: String -> String -> Integer --PaqueteModificaciones
-levenshtein = error "Implementar!!! (ejercicio 6)"
+len' :: String -> Integer
+len' [] = 0
+len' (x:xs) = 1 + len xs
 
+uno :: String -> String -> Integer
+uno s1 s2
+  | last s1 == last s2 = 0
+  | otherwise = 1
+  
+levenshtein :: String -> String -> Integer --PaqueteModificaciones
+levenshtein s1 s2
+  | min (len' s1) (len' s2) == 0 = max (len' s1) (len' s2)
+  | otherwise = min (min (levenshtein (init s1) s2 + 1)
+                     (levenshtein s1 (init s2) + 1))
+                (levenshtein (init s1) (init s2) + uno s1 s2)
+             
+  
 -- Ejemplos:
 -- Main> levenshtein "auto" "automata"
 -- 4
