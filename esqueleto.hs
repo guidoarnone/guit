@@ -159,7 +159,7 @@ levenshtein2 s1 s2
   | otherwise =
       minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
               Insertar (len' s1) (last s2):levenshtein2 s1 (init s2),
-              Substituir (len' s1) (last s2):levenshtein2 (init s1) (init s2)]
+              Substituir (len' s1 - 1) (last s2):levenshtein2 (init s1) (init s2)]
 
     
 -- Ejemplos:
