@@ -43,7 +43,7 @@ sust n c (x:xs) = x:sust (n-1) c xs
 insert :: Integer -> Char -> String -> String
 insert 0 c str = c:str
 insert _ _ [] = error
-                "La posicion donde se quiere insertar no existe an la string"
+                "La posicion donde se quiere insertar no existe en la string"
 insert n c (x:xs) = x:insert (n-1) c xs
 
 
@@ -62,15 +62,17 @@ aplicarModificacion str (Substituir n c) = sust n c str
 
 -- Ejercicio 2/8
 aplicarPaqueteModificaciones :: String -> PaqueteModificaciones -> String
-aplicarPaqueteModificaciones = error "Implementar!!! (ejercicio 2)"
+aplicarPaqueteModificaciones str [] = str
+aplicarPaqueteModificaciones str (m:ms) = aplicarPaqueteModificaciones (aplicarModificacion str m) ms
 
 -- Ejemplos:
--- Main> aplicarPaqueteModificaciones "dato" [Substituir 1 'p', Insertar 4 's']
+-- Main> aplicarPaqueteModificaciones "dato" [Substituir 0 'p', Insertar 4 's']
 -- "patos"
 
 -- Ejercicio 3/8
 obtenerUltimaVersion :: Archivo -> String
-obtenerUltimaVersion = error "Implementar!!! (ejercicio 3)"
+obtenerUltimaVersion ArchivoVacio = ""
+obtenerUltimaVersion (NuevaVersion paquete archivo) = aplicarPaqueteModificaciones (obtenerUltimaVersion archivo) paquete
 
 -- Ejemplos: (ver def. archivo1 y archivo2 abajo)
 -- Main> obtenerUltimaVersion archivo1
@@ -80,7 +82,8 @@ obtenerUltimaVersion = error "Implementar!!! (ejercicio 3)"
 
 -- Ejercicio 4/8
 cantVersiones :: Archivo -> Integer
-cantVersiones = error "Implementar!!! (ejercicio 4)"
+cantVersiones ArchivoVacio = 0
+cantVersiones (NuevaVersion paquete archivo) = 1 + cantVersiones archivo
 
 -- Ejemplos:
 -- Main> cantVersiones archivo1
@@ -89,8 +92,14 @@ cantVersiones = error "Implementar!!! (ejercicio 4)"
 -- 2
 
 -- Ejercicio 5/8
+
+obtenerArchivoAnterior :: Archivo -> Archivo
+obtenerArchivoAnterior ArchivoVacio = ArchivoVacio
+obtenerArchivoAnterior (NuevaVersion paquete archivo) = archivo
+
 obtenerVersion :: Integer -> Archivo -> String
-obtenerVersion  = error "Implementar!!! (ejercicio 5)"
+obtenerVersion n archivo | cantVersiones archivo == n = obtenerUltimaVersion archivo
+                         | otherwise = obtenerVersion n (obtenerArchivoAnterior archivo)
 
 -- Ejemplos:
 -- Main> obtenerVersion 1 archivo2
