@@ -111,7 +111,7 @@ obtenerVersion n archivo
 -- "dato"
 
 -- Ejercicio 6/8
-len' :: String -> Integer
+len' :: [a] -> Integer
 len' [] = 0
 len' (x:xs) = 1 + len xs
 
@@ -133,9 +133,35 @@ levenshtein s1 s2
 -- 4
 
 -- Ejercicio 7/8
-levenshtein2 :: String -> String -> PaqueteModificaciones
-levenshtein2 = error "Implementar!!! (ejercicio 7)"
+minlen :: [[a]] -> [a]
+minlen [] = error "minlen aplicado a lista vacia"
+minlen (l:[]) = l
+minlen (x:xs)
+  | len' x < len' (minlen xs) = x
+  | otherwise = minlen xs
 
+insertStr :: Integer -> String -> PaqueteModificaciones
+insertStr n [] = []
+insertStr n (x:xs) = Insertar n x : insertStr (n+1) xs
+
+borrarStr :: String -> PaqueteModificaciones
+borrarStr [] = []
+borrarStr (x:xs) = Borrar (len' (x:xs) - 1) : borrarStr xs
+
+levenshtein2 :: String -> String -> PaqueteModificaciones
+levenshtein2 [] s =  insertStr 0 s
+levenshtein2 s [] = borrarStr s
+levenshtein2 s1 s2 
+  | last s1 == last s2 =
+      minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
+              Insertar (len' s1) (last s2):levenshtein2 s1 (init s2),
+              levenshtein2 (init s1) (init s2)]
+  | otherwise =
+      minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
+              Insertar (len' s1) (last s2):levenshtein2 s1 (init s2),
+              Substituir (len' s1) (last s2):levenshtein2 (init s1) (init s2)]
+
+    
 -- Ejemplos:
 -- Main> levenshtein2 "auto" "automata"
 -- [Insertar 4 'a',Insertar 4 't',Insertar 4 'a',Insertar 4 'm']
