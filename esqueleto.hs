@@ -68,7 +68,7 @@ aplicarPaqueteModificaciones str (m:ms) =
   aplicarPaqueteModificaciones (aplicarModificacion str m) ms
 
 -- Ejemplos:
--- Main> aplicarPaqueteModificaciones "dato" [Substituir 0 'p', Insertar 4 's']
+-- Main> aplicarPaqueteModificaciones "dato" [Substituir 1 'p', Insertar 4 's']
 -- "patos"
 
 -- Ejercicio 3/8
@@ -169,7 +169,9 @@ levenshtein2 s1 s2
 
 -- Ejercicio 8/8
 agregarVersion :: String -> Archivo -> Archivo
-agregarVersion = error "Implementar!!! (ejercicio 8)"
+agregarVersion str archivo = (NuevaVersion paquete archivo)
+               where paquete = levenshtein2 (obtenerUltimaVersion archivo) str
+
 
 -- Ejemplos:
 -- Main> agregarVersion "dato" archivo2
