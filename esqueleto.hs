@@ -31,13 +31,13 @@ verArchivos (AgregarArchivo file scv)
 borrar :: Integer -> String -> String
 borrar _ [] = error
   "La string no posee un caracter en la posicion que se quiere borrar"
-borrar 0 (x:xs) = xs
+borrar 1 (x:xs) = xs
 borrar n (x:xs) = x:borrar (n-1) xs
 
 sust :: Integer -> Char -> String -> String
 sust _ _ [] = error
   "La string no posee un caracter en la posicion que se quiere sustituir"
-sust 0 c (x:xs) = c:xs
+sust 1 c (x:xs) = c:xs
 sust n c (x:xs) = x:sust (n-1) c xs
 
 insert :: Integer -> Char -> String -> String
@@ -52,13 +52,6 @@ aplicarModificacion str (Insertar n c) = insert n c str
 aplicarModificacion str (Borrar n) = borrar n str
 aplicarModificacion str (Substituir n c) = sust n c str
 
--- Ejemplos:
--- Main> aplicarModificacion "d" (Insertar 1 'a')
--- "da"
--- Main> aplicarModificacion "d" (Insertar 0 'a')
--- "ad"
--- Main> aplicarModificacion "dato" (Borrar 1)
--- "dto"
 
 -- Ejercicio 2/8
 aplicarPaqueteModificaciones ::
@@ -67,9 +60,6 @@ aplicarPaqueteModificaciones str [] = str
 aplicarPaqueteModificaciones str (m:ms) =
   aplicarPaqueteModificaciones (aplicarModificacion str m) ms
 
--- Ejemplos:
--- Main> aplicarPaqueteModificaciones "dato" [Substituir 1 'p', Insertar 4 's']
--- "patos"
 
 -- Ejercicio 3/8
 obtenerUltimaVersion :: Archivo -> String
@@ -77,23 +67,12 @@ obtenerUltimaVersion ArchivoVacio = ""
 obtenerUltimaVersion (NuevaVersion paquete archivo) =
   aplicarPaqueteModificaciones (obtenerUltimaVersion archivo) paquete
 
--- Ejemplos: (ver def. archivo1 y archivo2 abajo)
--- Main> obtenerUltimaVersion archivo1
--- "dato"
--- Main> obtenerUltimaVersion archivo2
--- "ddato"
-
 -- Ejercicio 4/8
 cantVersiones :: Archivo -> Integer
 cantVersiones ArchivoVacio = 0
 cantVersiones (NuevaVersion paquete archivo) =
   1 + cantVersiones archivo
 
--- Ejemplos:
--- Main> cantVersiones archivo1
--- 1
--- Main> cantVersiones archivo2
--- 2
 
 -- Ejercicio 5/8
 
@@ -106,9 +85,6 @@ obtenerVersion n archivo
   | cantVersiones archivo == n = obtenerUltimaVersion archivo
   | otherwise = obtenerVersion n (obtenerVersionAnterior archivo)
 
--- Ejemplos:
--- Main> obtenerVersion 1 archivo2
--- "dato"
 
 -- Ejercicio 6/8
 len' :: [a] -> Integer
@@ -120,17 +96,13 @@ uno s1 s2
   | last s1 == last s2 = 0
   | otherwise = 1
   
-levenshtein :: String -> String -> Integer --PaqueteModificaciones
+levenshtein :: String -> String -> Integer
 levenshtein s1 s2
   | min (len' s1) (len' s2) == 0 = max (len' s1) (len' s2)
   | otherwise = min (min (levenshtein (init s1) s2 + 1)
                      (levenshtein s1 (init s2) + 1))
                 (levenshtein (init s1) (init s2) + uno s1 s2)
              
-  
--- Ejemplos:
--- Main> levenshtein "auto" "automata"
--- 4
 
 -- Ejercicio 7/8
 minlen :: [[a]] -> [a]
@@ -146,20 +118,20 @@ insertStr n (x:xs) = Insertar n x : insertStr (n+1) xs
 
 borrarStr :: String -> PaqueteModificaciones
 borrarStr [] = []
-borrarStr (x:xs) = Borrar (len' (x:xs) - 1) : borrarStr xs
+borrarStr (x:xs) = Borrar (len' (x:xs) ) : borrarStr xs
 
 levenshtein2 :: String -> String -> PaqueteModificaciones
 levenshtein2 [] s =  insertStr 0 s
 levenshtein2 s [] = borrarStr s
 levenshtein2 s1 s2 
   | last s1 == last s2 =
-      minlen [Borrar (len' s1 - 1):levenshtein2 (init s1) s2,
+      minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
               Insertar (len' s1 - 1) (last s2):levenshtein2 s1 (init s2),
               levenshtein2 (init s1) (init s2)]
   | otherwise =
-      minlen [Borrar (len' s1 - 1):levenshtein2 (init s1) s2,
-              Insertar (len' s1 - 1) (last s2):levenshtein2 s1 (init s2),
-              Substituir (len' s1 - 1) (last s2):levenshtein2 (init s1) (init s2)]
+      minlen [Borrar (len' s1):levenshtein2 (init s1) s2,
+              Insertar (len' s1) (last s2):levenshtein2 s1 (init s2),
+              Substituir (len' s1) (last s2):levenshtein2 (init s1) (init s2)]
 
     
 -- Ejemplos:
@@ -187,3 +159,9 @@ len xs = fromIntegral (length xs)
 archivo1 = NuevaVersion [Insertar 0 'd', Insertar 1 'a', Insertar 2 't',Insertar 3 'o'] ArchivoVacio
 
 archivo2 = NuevaVersion [Insertar 0 'd'] archivo1
+
+
+
+
+testlev2 :: String -> String -> String 
+testlev2 s t = aplicarPaqueteModificaciones s (levenshtein2 s t)
